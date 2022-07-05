@@ -1,0 +1,28 @@
+<button
+  class="rounded uppercase text-sm leading-none px-6"
+  [ngClass]="{'text-blue dark:text-lightblue': selectedLangCode, 'dark:text-white': !selectedLangCode}"
+  cdkOverlayOrigin
+  #trigger=cdkOverlayOrigin
+  (click)="openLanguagePicker()"
+  type="button">
+  {{selectedLangCode ? getSelectedLanguage() : 'Language'}}
+  <fa-icon class="text-sm ml-3" [icon]="!isOpen ? faChevronDown : faChevronUp"></fa-icon>
+</button>
+
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="trigger"
+  [cdkConnectedOverlayOpen]="isOpen"
+  [cdkConnectedOverlayOffsetY]="1"
+  [cdkConnectedOverlayHasBackdrop]="true"
+  cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+  (backdropClick)="closeLanguagePicker()">
+  <div class="flex flex-col overflow-auto max-w-full w-fit max-h-52 bg-white rounded-b-lg px-6 pt-2 pb-4 my-4">
+    <ng-container *ngFor="let item of languages">
+      <button (click)="selectLanguage(item)"
+              class="text-sm text-left mb-4 last:mb-0 hover:text-blue dark:text-lightblue">
+        {{ item.label }}
+      </button>
+    </ng-container>
+  </div>
+</ng-template>

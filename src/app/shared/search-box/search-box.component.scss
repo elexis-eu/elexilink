@@ -1,0 +1,43 @@
+:host {
+  form.disabled {
+    background-color: #c3d3e6!important;
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+  }
+  .rounded-corners {
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+  }
+}
+
+::ng-deep {
+  .w-96 {
+    width: 40rem!important;
+  }
+  .vert-border {
+    transform: rotate(90deg);
+    width: 4.2rem;
+    margin-left: -3rem;
+    margin-right: -3rem;
+  }
+  .vert-border-small {
+    width: 3.2rem;
+  }
+  .mat-autocomplete-panel {
+    transform: translateY(9px);
+  }
+  .language-autocomplete {
+    width: 80%;
+    display: flex;
+    justify-content: space-between;
+    fa-icon {
+      display: inline-block;
+    }
+  }
+  .search-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+

@@ -1,0 +1,72 @@
+<div
+  [ngClass]="onHomeScreen ? 'shadow-xl bg-white' : 'shadow bg-white/60'"
+  class="rounded-lg dark:bg-midnight/70">
+  <div class="rounded-corners search-row" [ngClass]="{'py-2': !onHomeScreen, 'py-4': onHomeScreen}">
+    <smart-dropdown
+        title="Language"
+        [isSearchShown]="false"
+        [(isOpen)]="isLanguagePickerOpen"
+        [showSelectedTitle]="false"
+        [noBackground]="true"
+        (change)="onLanguageDropdownChange($event)"
+        [items]="data.sourceLanguages">
+    </smart-dropdown>
+    <hr class="border-lightgray dark:border-darkgray/60 vert-border" [ngClass]="{'vert-border-small': !onHomeScreen}">
+    <form class="language-autocomplete">
+      <input type="text"
+             #inputLanguages
+             placeholder="Search language"
+             class="bg-transparent dark:text-white focus:border-0 focus:outline-none focus-visible:outline-none text-1xl px-6"
+             [formControl]="autocomplete"
+             [matAutocomplete]="auto">
+      <button *ngIf="!!autocomplete.value" type="button" class="text-lightgray dark:text-darkgray" (click)="clearLanguage()">
+        <span class="sr-only">Clear search</span>
+        <fa-icon class="ml-4 px-6" [icon]="faTimes"></fa-icon>
+      </button>
+      <fa-icon *ngIf="!autocomplete.value" class="ml-4 px-6 text-lightgray" [icon]="faSearch"></fa-icon>
+      <mat-autocomplete (optionSelected)="onLanguageChange($event)" [autoActiveFirstOption]="true" #auto="matAutocomplete" [displayWith]="displayFn">
+        <mat-option *ngFor="let language of filteredLanguages | async" [value]="language.value">
+          {{language.label}}
+        </mat-option>
+      </mat-autocomplete>
+    </form>
+  </div>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" [ngClass]="{'lg:flex lg:items-center': shrink, 'disabled': form.disabled}">
+    <input type="hidden" formControlName="sourceLanguage">
+    <hr class="border-lightgray dark:border-darkgray/60" [ngClass]="{'lg:hidden': shrink}">
+
+    <div [ngClass]="{'flex items-center pr-4 py-2': !onHomeScreen}" class="flex-1">
+      <div [ngClass]="{'mb-4 py-4': onHomeScreen}" class="flex-1">
+        <input
+          #input
+          id="headword"
+          type="text"
+          formControlName="headword"
+          [ngClass]="{'lg:pl-0 lg:pr-3 lg:text-2xl': shrink}"
+          class="bg-transparent dark:text-white w-full focus:border-0 focus:outline-none focus-visible:outline-none text-2xl px-6">
+      </div>
+
+      <div class="flex justify-end p-2">
+        <button *ngIf="!onHomeScreen && !!form.value.headword" type="button" class="text-lightgray dark:text-darkgray" (click)="clear()">
+          <span class="sr-only">Clear search</span>
+          <fa-icon class="ml-4" [icon]="faTimes"></fa-icon>
+        </button>
+
+        <button
+          type="submit"
+          [disabled]="!form.value.headword || !form.value.sourceLanguage"
+          [ngClass]="onHomeScreen ? 'px-6 py-3 rounded-lg bg-blue text-white text-sm uppercase disabled:bg-lightgray/25 disabled:text-lightgray disabled:cursor-not-allowed focus:shadow-lg' : 'text-blue dark:text-lightblue disabled:text-lightgray disabled:cursor-not-allowed'">
+          <span *ngIf="onHomeScreen && !loading">Search</span>
+          <ng-container *ngIf="loading">
+            <span *ngIf="onHomeScreen">Searching...</span>
+            <svg class="inline animate-spin h-5 w-5 ml-3 mr-3" [ngClass]="onHomeScreen ? 'text-white' : 'text-blue dark:text-white'"fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </ng-container>
+          <fa-icon *ngIf="!loading" class="ml-4" [icon]="faSearch"></fa-icon>
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

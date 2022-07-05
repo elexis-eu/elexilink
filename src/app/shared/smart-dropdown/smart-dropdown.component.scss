@@ -1,0 +1,15 @@
+.is-opened {
+  position: relative;
+
+  $triangle-size: 8px;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: calc(50% - #{$triangle-size});
+    border-left: #{$triangle-size} solid transparent;
+    border-right: #{$triangle-size} solid transparent;
+    border-top: #{$triangle-size} solid theme('colors.blue');
+  }
+}

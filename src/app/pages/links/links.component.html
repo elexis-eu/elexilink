@@ -1,0 +1,44 @@
+<div class="py-8 bg-lavender dark:bg-marine min-h-full flex flex-col">
+  <div class="flex flex-col flex-1 mb-10">
+    <header class="container"></header>
+
+    <div #stickyArea [ngClass]="{'bg-lavender dark:bg-marine': shrink}" class="lg:sticky top-0">
+      <div class="container">
+        <div [ngClass]="{'lg:my-3': shrink}" class="lg:w-3/4 xl:w-1/2 mt-8 mb-10 mx-auto">
+          <search-box [shrink]="shrink"></search-box>
+        </div>
+
+        <div [ngClass]="{'lg:mb-0': shrink}" class="grid lg:grid-cols-2 lg:gap-8 my-6">
+        <div
+            class="lg:hidden bg-blue text-white rounded uppercase text-sm leading-none px-3 py-2 w-full text-left">
+            <fa-icon [icon]="faFilter" class="mr-2"></fa-icon>
+            Filters
+          </div>
+          <filters [dictionaries]="data.sourceDictionaries" (dictionariesChange)="emitSourceDictionarySearch($event)"></filters>
+          <filters [languages]="data.targetLanguages"
+                   (languagesChange)="emitLanguageSearch($event)"
+                   [dictionaries]="data.targetDictionaries"
+                   (dictionariesChange)="emitTargetDictionarySearch($event)"
+                   [similarities]="similarities"
+                   (similaritiesChange)="emitSimilaritySearch($event)"
+                   [showConceptViewToggle]="true"
+                   (conceptViewToggled)="emitConceptView($event)">
+          </filters>
+        </div>
+      </div>
+    </div>
+
+    <ng-container *ngFor="let items of links; let last = last">
+      <div class="container">
+        <search-result [items]="items" [conceptView]="conceptView"></search-result>
+
+        <div class="grid lg:grid-cols-2 lg:gap-8 my-6" *ngIf="!last">
+          <hr class="border-lightgray">
+          <hr class="border-lightgray hidden lg:block">
+        </div>
+      </div>
+    </ng-container>
+  </div>
+
+  <footer class="container"></footer>
+</div>

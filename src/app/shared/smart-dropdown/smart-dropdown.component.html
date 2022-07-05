@@ -1,0 +1,77 @@
+<button [ngClass]="
+        {
+          'text-white bg-blue is-opened': isOpen && !noBackground,
+          'text-blue dark:text-lightblue': (!isOpen && !noBackground) || (selectedItems.length === 1 && noBackground),
+          'dark:text-white': !isOpen && selectedItems.length === 0 && noBackground,
+          'font-bold': selectedItems.length > 0 && !noBackground
+        }"
+        class="rounded uppercase text-sm leading-none px-3 py-2"
+        cdkOverlayOrigin
+        #trigger="cdkOverlayOrigin" (click)="toggleMenu()">
+  {{ selectedTitle }}
+  <span *ngIf="selectedItems.length && !singleItemMode">/ {{ selectedItems.length }}</span>
+  <fa-icon class="text-sm ml-3" [icon]="!isOpen ? faChevronDown : faChevronUp"></fa-icon>
+</button>
+
+<ng-template
+  cdkConnectedOverlay
+  (backdropClick)="close()"
+  [cdkConnectedOverlayHasBackdrop]="true"
+  cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+  [cdkConnectedOverlayOrigin]="trigger"
+  [cdkConnectedOverlayWidth]="triggerRect?.width!"
+  [cdkConnectedOverlayOpen]="isOpen"
+  [cdkConnectedOverlayOffsetY]=13
+>
+  <div class="smart-dropdown w-full shadow-xl rounded-b bg-white dark:bg-midnight">
+    <div class="px-6 py-2 border-b border-lightgray dark:border-darkgray/60 relative" *ngIf="isSearchShown">
+      <div
+        class="absolute text-sm text-lightgray pointer-events-none top-1/2 transform -translate-y-1/2">
+        <fa-icon [icon]="faLookup"></fa-icon>
+      </div>
+      <div class="w-full ml-5 pr-2">
+        <input type="text"
+               class="text-sm w-full p-2 placeholder:text-lightgray dark:text-white bg-transparent"
+               #searchInput
+               (keydown.enter)="selectFirstItem()"
+               [placeholder]="searchPlaceholder" [(ngModel)]="q" (ngModelChange)="onInputChange($event)">
+      </div>
+    </div>
+
+    <div class="border-b flex flex-row flex-wrap px-6 py-3 border-b border-lightgray dark:border-darkgray/60"
+         *ngIf="selectedItems.length && !singleItemMode">
+      <ng-container *ngFor="let item of selectedItems">
+        <button class="text-blue dark:text-lightblue text-xs mr-3" (click)="toggleItem(item)">
+          {{item.label}}
+          <fa-icon [icon]="faMarks" class="ml-1"></fa-icon>
+        </button>
+      </ng-container>
+    </div>
+
+    <div class="py-5 px-6 flex flex-col overflow-auto" style="max-height: 300px">
+      <ng-container *ngFor="let item of filteredItems">
+        <button (click)="toggleItem(item)" class="text-left text-sm mb-4 last:mb-0">
+          <fa-icon
+                   [icon]="!item.selected ? faSquare : faSquareCheck"
+                   [style.visibility]="singleItemMode ? 'hidden' : 'visible'"
+                   [ngClass]="
+                    {
+                      'text-blue dark:text-lightblue': item.selected,
+                      'text-lightgray': !item.selected
+                    }
+                    " class="mr-3">
+          </fa-icon>
+          <span
+            [ngClass]="
+              {
+                'text-blue dark:text-lightblue': item.selected,
+                'text-black dark:text-lightgray': !item.selected,
+                'text-lightgray': isSelected(item)
+              }">{{ item.label }}</span>
+        </button>
+      </ng-container>
+    </div>
+  </div>
+
+</ng-template>
+

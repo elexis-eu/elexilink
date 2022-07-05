@@ -1,0 +1,14 @@
+<div class="grid grid-cols-3">
+  <div>
+    <button class="flex text-sm items-center dark:text-white" (click)="toggleDarkMode()">
+      <fa-icon [icon]="isDarkModeOn() ? faSun : faMoon" class="mr-2"></fa-icon>
+      {{isDarkModeOn() ? 'Light mode' : 'Dark mode'}}
+    </button>
+  </div>
+
+  <div>
+    <a href="/">
+      <img [src]="isDarkModeOn() ? 'assets/images/logo-blue.svg' : 'assets/images/logo-darkblue.svg'" alt="ElexiLink" style="width: auto; height: 57px;" class="mx-auto">
+    </a>
+  </div>
+</div>

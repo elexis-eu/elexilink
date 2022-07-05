@@ -1,0 +1,49 @@
+<div class="lg:flex items-center lg:mb-1 pt-2 lg:pt-0">
+  <div class="hidden lg:block text-blue dark:text-lightblue lg:py-3 lg:pr-3 lg:mr-2 border-r border-blue">
+    <button (click)="clear()" *ngIf="clearButtonEnabled">
+      <fa-icon [icon]="faArrowRotateRight"></fa-icon>
+      <span class="sr-only">Clear</span>
+    </button>
+
+    <div *ngIf="!clearButtonEnabled">
+      <fa-icon [icon]="faFilter"></fa-icon>
+      <span class="sr-only">Filter</span>
+    </div>
+  </div>
+
+  <div class="mb-2 lg:mr-2 lg:mb-0" *ngIf="languages.length">
+    <smart-dropdown title="Languages"
+                        searchPlaceholder="Search languages..."
+                        [items]="languages"
+                        (change)="onLanguagesChange($event)">
+    </smart-dropdown>
+  </div>
+
+  <div class="mb-2 lg:mr-2 lg:mb-0" *ngIf="dictionaries.length">
+    <smart-dropdown title="Dictionaries"
+                        searchPlaceholder="Search dictionaries..."
+                        [items]="dictionaries"
+                        (change)="onDictionariesChange($event)">
+    </smart-dropdown>
+  </div>
+
+  <!-- <div class="mb-2 lg:mr-2 lg:mb-0" *ngIf="similarities.length">
+    <smart-dropdown title="Similarities"
+                        searchPlaceholder="Search similarities..."
+                        [items]="similarities"
+                        (change)="onSimilaritiesChange($event)">
+    </smart-dropdown>
+  </div> -->
+
+  <button
+    *ngIf="showConceptViewToggle"
+    [title]="conceptView ? 'Disable concept view' : 'Enable concept view'"
+    (click)="toggleConceptView()"
+    [ngClass]="['ml-auto px-3 py-2 mb-2 lg:p-0 lg:mb-0 text-sm text-blue dark:text-lightblue', conceptView ? 'font-bold' : 'font-normal']">
+    Concept view
+    <fa-icon [icon]="conceptView ? faToggleOn : faToggleOff" class="ml-1"></fa-icon>
+    <span class="sr-only">{{conceptView ? "Disable concept view" : "Enable concept view"}}</span>
+  </button>
+</div>
+
+<hr class="border-1 lg:border-2 bg-blue border-blue">

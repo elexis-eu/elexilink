@@ -1,0 +1,10 @@
+<ul [class]="'flex text-sm ' + color">
+  <li *ngFor="let item of items" class="mr-3 lg:mr-8 lg:mr-12">
+    <a [href]="item.url" [title]="'Go to ' + item.label" class="hover:underline">
+      {{item.label}}
+    </a>
+  </li>
+  <li>
+    © elexiLink
+  </li>
+</ul>

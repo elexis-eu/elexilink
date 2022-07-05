@@ -1,0 +1,8 @@
+::ng-deep {
+  *:focus-visible {
+    outline: none;
+  }
+  button:disabled {
+    background-color: inherit!important;
+  }
+}

@@ -76,11 +76,9 @@ export class LinksComponent {
     if (!!this.conceptView) {
       queryParams["conceptView"] = this.conceptView;
     }
-    if (!!this.data.sourceDict) {
-      queryParams["sourceDict"] = this.data.sourceDict;
-    }
-    if (!!this.data.targetLanguage) {
-      queryParams["targetLanguage"] = this.data.targetLanguage;
+    queryParams["sourceDict"] = this.data.sourceDict;
+    if (!!this.data.targetDict) {
+      queryParams["targetDict"] = this.data.targetDict;
     }
     if (!!this.data.targetLanguage) {
       queryParams["targetLanguage"] = this.data.targetLanguage;
@@ -106,12 +104,10 @@ export class LinksComponent {
     if (!!this.data.sourceDict) {
       queryParams["sourceDict"] = this.data.sourceDict;
     }
-    if (!!this.data.targetLanguage) {
-      queryParams["targetLanguage"] = this.data.targetLanguage;
+    if (!!this.data.targetDict) {
+      queryParams["targetDict"] = this.data.targetDict;
     }
-    if (!!this.data.targetLanguage) {
-      queryParams["targetLanguage"] = this.data.targetLanguage;
-    }
+    queryParams["targetLanguage"] = this.data.targetLanguage;
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: queryParams,
@@ -129,9 +125,7 @@ export class LinksComponent {
     if (!!this.data.sourceDict) {
       queryParams["sourceDict"] = this.data.sourceDict;
     }
-    if (!!this.data.targetLanguage) {
-      queryParams["targetLanguage"] = this.data.targetLanguage;
-    }
+    queryParams["targetDict"] = this.data.targetDict;
     if (!!this.data.targetLanguage) {
       queryParams["targetLanguage"] = this.data.targetLanguage;
     }
@@ -150,14 +144,12 @@ export class LinksComponent {
   public emitConceptView(conceptView: boolean) {
     this.conceptView = conceptView;
     const queryParams: any = {};
-    if (!!this.conceptView) {
-      queryParams["conceptView"] = this.conceptView;
-    }
+    queryParams["conceptView"] = this.conceptView;
     if (!!this.data.sourceDict) {
       queryParams["sourceDict"] = this.data.sourceDict;
     }
-    if (!!this.data.targetLanguage) {
-      queryParams["targetLanguage"] = this.data.targetLanguage;
+    if (!!this.data.targetDict) {
+      queryParams["targetDict"] = this.data.targetDict;
     }
     if (!!this.data.targetLanguage) {
       queryParams["targetLanguage"] = this.data.targetLanguage;

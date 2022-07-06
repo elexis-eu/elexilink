@@ -31,7 +31,10 @@ export class DataService implements Resolve<[Core.SelectableItem<Language.Result
   @LocalStorage() private languages: Core.SelectableItem<Language.Result>[] = [];
   @LocalStorage() private dictionaries: Core.SelectableItem<Dictionary.Result>[] = [];
   @LocalStorage() private links: Link.Result[] = [];
+  @LocalStorage() private rawLinks: Link.RawResult[] = [];
+
   private cachedDictionaries: Map<string, Dictionary.Result> = new Map<string, Dictionary.Result>();
+  @LocalStorage() private lastPathParameters!: Link.Parameters;
   private readonly apiUrl: API.URL;
   private readonly apikey: API.Key;
   private readonly email: API.Email;
@@ -84,6 +87,8 @@ export class DataService implements Resolve<[Core.SelectableItem<Language.Result
         return iif(() => _.isEmpty(results), of([]), of(results))
       }),
       mergeMap((results: Link.RawResult[]) => {
+        this.lastPathParameters = {..._.cloneDeep(pathParameters), sourceDict};
+        this.rawLinks = results;
         results = _.filter(results, (result) => (result.targetDictConcept + "") === conceptView);
         const bufferSize = _.size(results);
         return of(results).pipe(
@@ -372,6 +377,11 @@ export class DataService implements Resolve<[Core.SelectableItem<Language.Result
   }
 
   private fetchLinks$(parameters: Link.Parameters): Observable<Link.RawResult[]> {
+    const currentPathParameters = _.compact(_.values(_.pick(parameters, ["headword", "sourceLanguage", "sourceDict"])));
+    const lastPathParameters = _.compact(_.values(this.lastPathParameters));
+    if (_.every(currentPathParameters, (parameter) => _.includes(lastPathParameters, parameter)) && !_.isEmpty(this.rawLinks) && _.size(currentPathParameters) === _.size(lastPathParameters)) {
+      return of(this.rawLinks);
+    }
     return this.httpClient
       .post<Link.ListResults>(this.apiUrl + "/api/listLinks", {
         ...parameters,

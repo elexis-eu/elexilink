@@ -127,6 +127,7 @@ export class FiltersComponent implements OnInit {
     this.languages = cloneDeep(this.languages.map(el => {el.selected = false; return el}))
     this.similarities = cloneDeep(this.similarities.map(el => {el.selected = false; return el}))
     this.clearButtonEnabled = false
+
     const config = {
       relativeTo: this.route,
       queryParams: {},

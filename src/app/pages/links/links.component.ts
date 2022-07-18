@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Component, ViewChild, ElementRef, ChangeDetectionStrategy, AfterViewInit, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
 import get from "lodash-es/get";
@@ -11,7 +11,7 @@ import { DataService } from "src/app/core/services/data.service";
   templateUrl: './links.component.html',
   styleUrls: ['./links.component.scss'],
 })
-export class LinksComponent {
+export class LinksComponent implements AfterViewInit, OnInit {
   @ViewChild('stickyArea') stickyArea!: ElementRef;
 
   @LocalStorage() links: Link.Result[] = [];
@@ -43,8 +43,11 @@ export class LinksComponent {
     private router: Router,
   ) {}
 
-  ngAfterViewInit(): void {
+  ngOnInit(): void {
     this.conceptView = !!this.route.snapshot.queryParams["conceptView"];
+  }
+
+  ngAfterViewInit(): void {
     let lastChange = 0;
 
     let observer = new IntersectionObserver(

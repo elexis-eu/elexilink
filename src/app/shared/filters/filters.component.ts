@@ -30,7 +30,7 @@ export class FiltersComponent implements OnInit {
   @Output('similaritiesChange') similaritiesChange = new EventEmitter<Similarity.Result[]>();
 
   @Input('showConceptViewToggle') showConceptViewToggle = false
-
+  @Input('conceptView') conceptView = false
   @Output('conceptViewToggled') conceptViewToggled = new EventEmitter<boolean>();
 
   faFilter = faFilter;
@@ -39,7 +39,6 @@ export class FiltersComponent implements OnInit {
   faToggleOn = faToggleOn;
 
   clearButtonEnabled = false
-  conceptView = false
 
   constructor(
     private router: Router,

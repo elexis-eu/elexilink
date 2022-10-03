@@ -84,6 +84,7 @@ export class DataService implements Resolve<[Core.SelectableItem<Language.Result
         this.lastPathParameters = {..._.cloneDeep(pathParameters), sourceDict};
         this.rawLinks = results;
         results = _.filter(results, (result) => (result.targetDictConcept + "") === conceptView);
+        if (_.isEmpty(results)) return of([]);
         const bufferSize = _.size(results);
         return of(results).pipe(
           concatMap((links) => links),

@@ -136,12 +136,12 @@ export class DataService implements Resolve<[Core.SelectableItem<Language.Result
             if (!!link.sourceConnectedLinks) {
               result.source = link.sourceConnectedLinks.map((link) => {
                 const selectableItem = this.prepareSourceDictFromLink(link, sourceDict, true, link.sourceLang || pathParameters.sourceLanguage);
-                this.sourceDictionaries = [...this.sourceDictionaries, selectableItem];
+                this.sourceDictionaries = _.uniqBy([...this.sourceDictionaries, selectableItem], (item) => _.get(item, "value.id"));
                 return this.transformToSourceLink(link);
               });
             } else {
               const selectableItem = this.prepareSourceDictFromLink(link, sourceDict, false, link.sourceLang || pathParameters.sourceLanguage);
-              this.sourceDictionaries = [...this.sourceDictionaries, selectableItem];
+              this.sourceDictionaries = _.uniqBy([...this.sourceDictionaries, selectableItem], (item) => _.get(item, "value.id"));
               result.source = [this.transformToSourceLink(link)];
             }
             // Transform it to meta data for dictionary, due to the fact it's lost otherwise
@@ -149,12 +149,12 @@ export class DataService implements Resolve<[Core.SelectableItem<Language.Result
               result.concept = this.transformToTargetLink(link)
               for (const targetConnectedLink of (link.targetConnectedLinks || []) ) {
                 const selectableItem = this.prepareTargetDictFromLink(targetConnectedLink, targetDict, true, targetConnectedLink.targetLang);
-                this.targetDictionaries = [...this.targetDictionaries, selectableItem];
+                this.targetDictionaries = _.uniqBy([...this.targetDictionaries, selectableItem], (item) => _.get(item, "value.id"));
               }
               this.targetLanguageCodes = _.uniq([...this.targetLanguageCodes, ..._.map(link.targetConnectedLinks, "targetLang")]);
             } else {
               const selectableItem = this.prepareTargetDictFromLink(link, targetDict, false, targetLanguage);
-              this.targetDictionaries = [...this.targetDictionaries, selectableItem];
+              this.targetDictionaries = _.uniqBy([...this.targetDictionaries, selectableItem], (item) => _.get(item, "value.id"));
               this.targetLanguageCodes = [...this.targetLanguageCodes, link.targetLang];
             }
             if (!!link.targetConnectedLinks) {

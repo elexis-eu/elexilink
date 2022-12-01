@@ -9,7 +9,7 @@
       <ul class="flex">
         <li class="mr-2">ID {{items?.concept?.id}}</li>
         <li class="mr-2">/</li>
-        <li><a href="#" class="underline">{{items?.concept?.dictTitle}}</a></li>
+        <li><a [href]="generateLink()" target="_blank" class="underline">{{items?.concept?.dictTitle}}</a></li>
       </ul>
     </div>
 

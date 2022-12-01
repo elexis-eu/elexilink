@@ -85,15 +85,14 @@ export class DataService implements Resolve<[Core.SelectableItem<Language.Result
         this.rawLinks = results;
         results = _.filter(results, (result) => (result.targetDictConcept + "") === conceptView);
         if (_.isEmpty(results)) return of([]);
+        if (conceptView === "false") {
+          results = this.eliminateDuplicatedLinks(results);
+        }
         const bufferSize = _.size(results);
         return of(results).pipe(
           concatMap((links) => links),
           concatMap((link: Link.RawResult) => {
-            return iif(
-              () => !!link.sourceDictConcept,
-              this.fetchSupportingLinks$(link, Origin.Source),
-              this.updateLanguageLabel$(link, Origin.Source)
-            );
+            return this.updateLanguageLabel$(link, Origin.Source);
           }),
           concatMap((link: Link.RawResult) => {
             return iif(
@@ -174,6 +173,12 @@ export class DataService implements Resolve<[Core.SelectableItem<Language.Result
         this.links = links;
       }),
     );
+  }
+
+  eliminateDuplicatedLinks(links: Link.RawResult[]): Link.RawResult[] {
+    return _.flatten(_.map(_.groupBy(links, (result) => (result.sourceID + "") + (result.targetID + "")), (group) => {
+      return _.maxBy(group, (result) => result.confidence);
+    })) as Link.RawResult[];
   }
 
   prepareSourceDictFromLink(link: Link.RawResult, dict: string, hasLinks: boolean, lang?: string): Core.SelectableItem<Dictionary.Result> {
@@ -261,6 +266,7 @@ export class DataService implements Resolve<[Core.SelectableItem<Language.Result
         return this.updateLanguageLabels$(supportingLinks, origin);
       }),
       map((links) => {
+        links = this.eliminateDuplicatedLinks(links);
         _.set(link, origin + "ConnectedLinks", links);
         return link;
       })
@@ -285,6 +291,7 @@ export class DataService implements Resolve<[Core.SelectableItem<Language.Result
   private transformToSourceLink(link: Link.RawResult): Link.FormattedResult {
     return {
       id: link.sourceID,
+      lang: link.sourceLang,
       collection: {
         link: link.sourceURL,
         name: link.sourceDict
@@ -298,6 +305,7 @@ export class DataService implements Resolve<[Core.SelectableItem<Language.Result
   private transformToTargetLink(link: Link.RawResult): Link.FormattedResult {
     return {
       id: link.targetID,
+      lang: link.targetLang,
       collection: {
         link: link.targetURL,
         name: link.targetDict

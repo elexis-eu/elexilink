@@ -144,6 +144,7 @@ declare namespace Link {
 
   interface FormattedResult {
     id: number | string;
+    lang?: string;
     collection: { link: string, name: string };
     description: string | undefined;
     term: Value;

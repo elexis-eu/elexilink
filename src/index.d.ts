@@ -134,6 +134,7 @@ declare namespace Link {
     targetLang: string;
     targetHeadword: string;
     targetDescription?: string;
+    targetPreview?: string;
     targetSimilarity?: string;
     targetID: number;
     targetURL: string;

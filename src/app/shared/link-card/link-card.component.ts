@@ -23,12 +23,16 @@ export class LinkCardComponent implements OnInit {
 
   getSimilarityColor(): string {
     switch (this.link.similarity) {
-      case 'exact':
+      case 'EXACT':
         return 'bg-similarity-exact';
-      case 'broader':
+      case 'BROADER':
         return 'bg-similarity-broader';
-      case 'narrower':
+      case 'RELATED':
+        return 'bg-similarity-broader';
+      case 'NARROWER':
         return 'bg-similarity-narrower';
+      case 'UNRELATED':
+        return 'bg-similarity-unrelated';
       default:
         return 'bg-similarity-exact';
     }

@@ -15,23 +15,6 @@ export class LinksComponent implements AfterViewInit, OnInit {
   @ViewChild('stickyArea') stickyArea!: ElementRef;
 
   @LocalStorage() links: Link.Result[] = [];
-  similarities = [
-    {
-      label: 'Exact',
-      value: 'exact',
-      selected: false,
-    },
-    {
-      label: 'Broader',
-      value: 'broader',
-      selected: false,
-    },
-    {
-      label: 'Narrower',
-      value: 'narrower',
-      selected: false,
-    },
-  ];
 
   conceptView = false;
   shrink = false;
@@ -45,6 +28,7 @@ export class LinksComponent implements AfterViewInit, OnInit {
 
   ngOnInit(): void {
     this.conceptView = !!this.route.snapshot.queryParams["conceptView"];
+    this.data.similarity = this.route.snapshot.queryParams["similarity"];
   }
 
   ngAfterViewInit(): void {
@@ -104,6 +88,7 @@ export class LinksComponent implements AfterViewInit, OnInit {
     if (!!this.conceptView) {
       queryParams["conceptView"] = this.conceptView;
     }
+    queryParams["similarity"] = this.data.similarity;
     if (!!this.data.sourceDict) {
       queryParams["sourceDict"] = this.data.sourceDict;
     }
@@ -122,6 +107,7 @@ export class LinksComponent implements AfterViewInit, OnInit {
   public emitTargetDictionarySearch(items: Dictionary.Result[]) {
     this.data.targetDict = get(items, "[0].id");
     const queryParams: any = {};
+    queryParams["similarity"] = this.data.similarity;
     if (!!this.conceptView) {
       queryParams["conceptView"] = this.conceptView;
     }
@@ -142,12 +128,33 @@ export class LinksComponent implements AfterViewInit, OnInit {
 
   public emitSimilaritySearch(items: Similarity.Result[]) {
     this.data.similarity = get(items, "[0]");
+    const queryParams: any = {};
+    if (!!this.conceptView) {
+      queryParams["conceptView"] = this.conceptView;
+    }
+    queryParams["similarity"] = this.data.similarity;
+    if (!!this.data.sourceDict) {
+      queryParams["sourceDict"] = this.data.sourceDict;
+    }
+    if (!!this.data.targetDict) {
+      queryParams["targetDict"] = this.data.targetDict;
+    }
+    if (!!this.data.targetLanguage) {
+      queryParams["targetLanguage"] = this.data.targetLanguage;
+    }
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: queryParams,
+      queryParamsHandling: "merge",
+      replaceUrl: true,
+    });
   }
 
   public emitConceptView(conceptView: boolean) {
     this.conceptView = conceptView;
     const queryParams: any = {};
     queryParams["conceptView"] = this.conceptView;
+    queryParams["similarity"] = this.data.similarity;
     if (!!this.data.sourceDict) {
       queryParams["sourceDict"] = this.data.sourceDict;
     }

@@ -17,6 +17,18 @@ enum Origin {
 export class DataService implements Resolve<[Core.SelectableItem<Language.Result>[], Link.Result[]]> {
   sourceDictionaries: Core.SelectableItem<Dictionary.Result>[] = [];
   targetDictionaries: Core.SelectableItem<Dictionary.Result>[] = [];
+  similarities: Core.SelectableItem<string>[] = [
+    {
+      label: 'Exact',
+      value: 'exact',
+      selected: false,
+    },
+    {
+      label: 'Related',
+      value: 'related',
+      selected: false,
+    },
+  ];
   // Additional search parameters
   sourceDict!: string;
   targetLanguage!: string;
@@ -30,6 +42,7 @@ export class DataService implements Resolve<[Core.SelectableItem<Language.Result
   @LocalStorage() private links: Link.Result[] = [];
   @LocalStorage() private rawLinks: Link.RawResult[] = [];
   @LocalStorage() private lastPathParameters!: Link.Parameters;
+  private readonly confidenceThreshold = 0.5;
   private readonly apiUrl: API.URL;
   private readonly apikey: API.Key;
   private readonly email: API.Email;
@@ -68,8 +81,12 @@ export class DataService implements Resolve<[Core.SelectableItem<Language.Result
     if (!!sourceDict) {
       parameters.sourceDict = sourceDict;
     }
-    if (!!similarity) {
-      parameters.similarity = similarity;
+  if (!!similarity) {
+      this.similarity = similarity;
+      const selectedSimilarity = _.find(this.similarities, "value", similarity);
+      if (!!selectedSimilarity) {
+        selectedSimilarity.selected = true;
+      }
     }
     this.localStorage.remove("links");
     this.localStorage.set("noResults", false);
@@ -83,7 +100,9 @@ export class DataService implements Resolve<[Core.SelectableItem<Language.Result
       mergeMap((results: Link.RawResult[]) => {
         this.lastPathParameters = {..._.cloneDeep(pathParameters), sourceDict};
         this.rawLinks = results;
-        results = _.filter(results, (result) => (result.targetDictConcept + "") === conceptView);
+        results = _.filter(results, (result) => {
+          return (result.targetDictConcept + "") === conceptView && this.isSimilarOrAboveThreshold(result);
+        });
         if (_.isEmpty(results)) return of([]);
         if (conceptView === "false") {
           results = this.eliminateDuplicatedLinks(results);
@@ -102,8 +121,11 @@ export class DataService implements Resolve<[Core.SelectableItem<Language.Result
             );
           }),
           filter((result) => {
-            if (!targetLanguage || result.targetDictConcept) return true;
-            return _.isEmpty(result.targetLang) || result.targetLang === targetLanguage;
+            if (!targetLanguage || (result.targetDictConcept && !_.isEmpty(result.targetConnectedLinks || []))) return true;
+            return (
+              (_.isEmpty(result.targetLang) || result.targetLang === targetLanguage) &&
+              this.isSimilarOrAboveThreshold(result)
+            );
           }),
           map((link: Link.RawResult) => {
             if (!targetLanguage) return link;
@@ -255,6 +277,17 @@ export class DataService implements Resolve<[Core.SelectableItem<Language.Result
     );
   }
 
+  private isSimilarOrAboveThreshold(link: Link.RawResult): boolean {
+    switch (_.upperCase(this.similarity)) {
+      case 'RELATED':
+        return this.isLinkRelated(link) && this.isLinkAboveThreshold(link);
+      case 'EXACT':
+        return this.isLinkExact(link) && this.isLinkAboveThreshold(link);
+      default:
+        return this.isLinkAboveThreshold(link);
+    }
+  }
+
   private fetchSupportingLinks$(link: Link.RawResult, origin: Origin) {
     const parameters = {
       headword: _.get(link, origin + "Headword"),
@@ -266,6 +299,7 @@ export class DataService implements Resolve<[Core.SelectableItem<Language.Result
         return this.updateLanguageLabels$(supportingLinks, origin);
       }),
       map((links) => {
+        links = _.filter(links, (supportLink) => this.isSimilarOrAboveThreshold(supportLink))
         links = this.eliminateDuplicatedLinks(links);
         _.set(link, origin + "ConnectedLinks", links);
         return link;
@@ -302,7 +336,26 @@ export class DataService implements Resolve<[Core.SelectableItem<Language.Result
     };
   }
 
+  private isLinkAboveThreshold(link: Link.RawResult) {
+    return link.confidence >= this.confidenceThreshold;
+  }
+
+  private isLinkExact(link: Link.RawResult) {
+    return link.confidence > 0.7;
+  }
+
+  private isLinkRelated(link: Link.RawResult) {
+    return (link.confidence >= 0.5 && link.confidence <= 0.7);
+  }
+
   private transformToTargetLink(link: Link.RawResult): Link.FormattedResult {
+    // If confidence score is higher than 70% then set similarity as EXACT
+    let similarity = link.targetSimilarity;
+    if (this.isLinkExact(link)) {
+      similarity = "EXACT";
+    } else if (this.isLinkRelated(link)) {
+      similarity = "RELATED";
+    }
     return {
       id: link.targetID,
       lang: link.targetLang,
@@ -311,9 +364,9 @@ export class DataService implements Resolve<[Core.SelectableItem<Language.Result
         name: link.targetDict
       },
       dictTitle: link.targetDictTitle,
-      description: link.targetDescription,
+      description: link.targetPreview,
       term: link.targetHeadword,
-      similarity: link.targetSimilarity,
+      similarity,
     };
   }
 

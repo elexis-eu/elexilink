@@ -1,12 +1,13 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {faLink, faEllipsis} from '@fortawesome/free-solid-svg-icons';
+import { DataService } from "src/app/core/services/data.service";
 
 @Component({
   selector: 'link-card',
   templateUrl: './link-card.component.html',
   styleUrls: ['./link-card.component.scss']
 })
-export class LinkCardComponent implements OnInit {
+export class LinkCardComponent {
 
   @Input('link') link!: any;
 
@@ -15,10 +16,19 @@ export class LinkCardComponent implements OnInit {
 
   expanded = false;
 
-  constructor() {
+  constructor(
+    public data: DataService,
+  ) {}
+
+  get headword(): string {
+    return this.data.headword;
   }
 
-  ngOnInit(): void {
+  prettifyDescription(description: string): string {
+    if (description === "%(def)") {
+      return "No definition";
+    }
+    return description;
   }
 
   getSimilarityColor(): string {

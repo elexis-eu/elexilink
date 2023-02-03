@@ -29,11 +29,13 @@ export class DataService implements Resolve<[Core.SelectableItem<Language.Result
       selected: false,
     },
   ];
+  headword!: string;
+  conceptView: boolean = false;
   // Additional search parameters
-  sourceDict!: string;
-  targetLanguage!: string;
-  targetDict!: string;
-  similarity!: string;
+  sourceDict!: string | undefined;
+  targetLanguage!: string | undefined;
+  targetDict!: string | undefined;
+  similarity!: string | undefined;
   sourceLanguages: Core.SelectableItem<Language.Result>[] = [];
   targetLanguages: Core.SelectableItem<Language.Result>[] = [];
   sourceLanguageCodes: string[] = [];
@@ -76,8 +78,10 @@ export class DataService implements Resolve<[Core.SelectableItem<Language.Result
   listLinks$(route: ActivatedRouteSnapshot): Observable<Link.Result[]> {
     const pathParameters = route.params as Link.Parameters;
     if (_.isEmpty(pathParameters)) return of([]);
+    this.headword = pathParameters.headword;
     let parameters = {...pathParameters} as Link.Parameters;
     const {sourceDict, targetLanguage, targetDict, similarity, conceptView = "false"} = route.queryParams;
+    this.conceptView = conceptView === "true";
     if (!!sourceDict) {
       parameters.sourceDict = sourceDict;
     }
@@ -101,18 +105,26 @@ export class DataService implements Resolve<[Core.SelectableItem<Language.Result
         this.lastPathParameters = {..._.cloneDeep(pathParameters), sourceDict};
         this.rawLinks = results;
         results = _.filter(results, (result) => {
-          return (result.targetDictConcept + "") === conceptView && this.isSimilarOrAboveThreshold(result);
+          return (result.targetDictConcept + "") === conceptView &&
+                this.isSimilarOrAboveThreshold(result) &&
+                result.sourceHeadword === this.headword;
         });
         if (_.isEmpty(results)) return of([]);
         if (conceptView === "false") {
           results = this.eliminateDuplicatedLinks(results);
         }
         const bufferSize = _.size(results);
+        // Each links is representated in 2 ways, source and targets.
+        // Source is always a single item while target can be an array of items or a single item.
+        // It depends on the conceptView parameter.
         return of(results).pipe(
+          // Split the results into single emits
           concatMap((links) => links),
+          // Acquire language data for each source and update it's corresponding language label
           concatMap((link: Link.RawResult) => {
             return this.updateLanguageLabel$(link, Origin.Source);
           }),
+          // Acquire language data for each target and update it's corresponding language label
           concatMap((link: Link.RawResult) => {
             return iif(
               () => !!link.targetDictConcept,
@@ -120,6 +132,8 @@ export class DataService implements Resolve<[Core.SelectableItem<Language.Result
               this.updateLanguageLabel$(link, Origin.Target)
             );
           }),
+          // If we are conceptView is true and target links are available then determine if targets are similar or above threshold
+          // for confidence scores and if not then remove them from the list.
           filter((result) => {
             if (!targetLanguage || (result.targetDictConcept && !_.isEmpty(result.targetConnectedLinks || []))) return true;
             return (
@@ -127,6 +141,7 @@ export class DataService implements Resolve<[Core.SelectableItem<Language.Result
               this.isSimilarOrAboveThreshold(result)
             );
           }),
+          // If targetLanguage is defined, then filter out all links that do not match the targetLanguage.
           map((link: Link.RawResult) => {
             if (!targetLanguage) return link;
             if (link.targetConnectedLinks) {
@@ -136,10 +151,12 @@ export class DataService implements Resolve<[Core.SelectableItem<Language.Result
             }
             return link;
           }),
+          // If targetDict is defined and conceptView is false, then filter out all links that do not match the targetDict.
           filter((result) => {
             if (!targetDict || result.targetDictConcept) return true;
             return _.isEmpty(result.targetDict) || result.targetDict === targetDict;
           }),
+          // If targetDict is defined and conceptView is true, then filter out all links that do not match the targetDict.
           map((link: Link.RawResult) => {
             if (!targetDict) return link;
             if (link.targetConnectedLinks) {
@@ -149,6 +166,11 @@ export class DataService implements Resolve<[Core.SelectableItem<Language.Result
             }
             return link;
           }),
+          filter((result) => {
+            if (!result.targetDictConcept) return true;
+            return !_.isEmpty(result.targetConnectedLinks);
+          }),
+          // Prepare the object for UI purposes.
           map((link: Link.RawResult) => {
             const result: Link.Result = {
               source: [],
@@ -188,7 +210,7 @@ export class DataService implements Resolve<[Core.SelectableItem<Language.Result
             return result;
           }),
           bufferCount(bufferSize)
-        );
+        ) as Observable<Link.Result[]>;
       }),
       tap((links) => {
         this.localStorage.set("noResults", false);

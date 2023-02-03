@@ -2,7 +2,7 @@
   <div class="flex flex-col flex-1 mb-10">
     <header class="container"></header>
 
-    <div #stickyArea [ngClass]="{'bg-lavender dark:bg-marine': shrink}" class="lg:sticky top-0">
+    <div #stickyArea class="lg:sticky bg-lavender dark:bg-marine top-0">
       <div class="container">
         <div [ngClass]="{'lg:my-3': shrink}" class="lg:w-3/4 xl:w-1/2 mt-8 mb-10 mx-auto">
           <search-box [shrink]="shrink"></search-box>
@@ -21,7 +21,7 @@
                    (dictionariesChange)="emitTargetDictionarySearch($event)"
                    [similarities]="data.similarities"
                    (similaritiesChange)="emitSimilaritySearch($event)"
-                   [conceptView]="conceptView"
+                   [conceptView]="data.conceptView"
                    [showConceptViewToggle]="true"
                    (conceptViewToggled)="emitConceptView($event)">
           </filters>
@@ -31,7 +31,7 @@
 
     <ng-container *ngFor="let items of links; let last = last">
       <div class="container">
-        <search-result [items]="items" [conceptView]="conceptView"></search-result>
+        <search-result [items]="items" [conceptView]="data.conceptView"></search-result>
 
         <div class="grid lg:grid-cols-2 lg:gap-8 my-6" *ngIf="!last">
           <hr class="border-lightgray">

@@ -16,7 +16,6 @@ export class LinksComponent implements AfterViewInit, OnInit {
 
   @LocalStorage() links: Link.Result[] = [];
 
-  conceptView = false;
   shrink = false;
   faFilter = faFilter;
 
@@ -27,7 +26,7 @@ export class LinksComponent implements AfterViewInit, OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.conceptView = !!this.route.snapshot.queryParams["conceptView"];
+    this.data.conceptView = !!this.route.snapshot.queryParams["conceptView"];
     this.data.similarity = this.route.snapshot.queryParams["similarity"];
   }
 
@@ -60,8 +59,8 @@ export class LinksComponent implements AfterViewInit, OnInit {
   public emitSourceDictionarySearch(items: Dictionary.Result[]) {
     this.data.sourceDict = get(items, "[0].id");
     const queryParams: any = {};
-    if (!!this.conceptView) {
-      queryParams["conceptView"] = this.conceptView;
+    if (!!this.data.conceptView) {
+      queryParams["conceptView"] = this.data.conceptView;
     }
     queryParams["sourceDict"] = this.data.sourceDict;
     if (!!this.data.targetDict) {
@@ -85,8 +84,8 @@ export class LinksComponent implements AfterViewInit, OnInit {
     }
     this.data.targetLanguage = codes[0];
     const queryParams: any = {};
-    if (!!this.conceptView) {
-      queryParams["conceptView"] = this.conceptView;
+    if (!!this.data.conceptView) {
+      queryParams["conceptView"] = this.data.conceptView;
     }
     queryParams["similarity"] = this.data.similarity;
     if (!!this.data.sourceDict) {
@@ -108,8 +107,8 @@ export class LinksComponent implements AfterViewInit, OnInit {
     this.data.targetDict = get(items, "[0].id");
     const queryParams: any = {};
     queryParams["similarity"] = this.data.similarity;
-    if (!!this.conceptView) {
-      queryParams["conceptView"] = this.conceptView;
+    if (!!this.data.conceptView) {
+      queryParams["conceptView"] = this.data.conceptView;
     }
     if (!!this.data.sourceDict) {
       queryParams["sourceDict"] = this.data.sourceDict;
@@ -129,8 +128,8 @@ export class LinksComponent implements AfterViewInit, OnInit {
   public emitSimilaritySearch(items: Similarity.Result[]) {
     this.data.similarity = get(items, "[0]");
     const queryParams: any = {};
-    if (!!this.conceptView) {
-      queryParams["conceptView"] = this.conceptView;
+    if (!!this.data.conceptView) {
+      queryParams["conceptView"] = this.data.conceptView;
     }
     queryParams["similarity"] = this.data.similarity;
     if (!!this.data.sourceDict) {
@@ -151,9 +150,9 @@ export class LinksComponent implements AfterViewInit, OnInit {
   }
 
   public emitConceptView(conceptView: boolean) {
-    this.conceptView = conceptView;
+    this.data.conceptView = conceptView;
     const queryParams: any = {};
-    queryParams["conceptView"] = this.conceptView;
+    queryParams["conceptView"] = this.data.conceptView;
     queryParams["similarity"] = this.data.similarity;
     if (!!this.data.sourceDict) {
       queryParams["sourceDict"] = this.data.sourceDict;
@@ -166,7 +165,7 @@ export class LinksComponent implements AfterViewInit, OnInit {
     }
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: {conceptView: this.conceptView},
+      queryParams: {conceptView: this.data.conceptView},
       queryParamsHandling: "merge",
       replaceUrl: true,
     });

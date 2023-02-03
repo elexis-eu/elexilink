@@ -5,25 +5,16 @@
         {{ link.term }}
       </h2>
 
-      <a [href]="link.collection.link" [title]="'More about ' + link.term" class="text-blue dark:text-link">
+      <a [href]="link.collection.link" target="_blank" [title]="'More about ' + link.term" class="text-blue dark:text-link">
         <fa-icon [icon]="faLink"></fa-icon>
       </a>
     </div>
 
     <div class="text-darkgray dark:text-lightgray">
       <p>
-        {{ link.description}}
+        {{ prettifyDescription(link.description)}}
       </p>
-
-      <!-- <div class="p-0" *ngIf="expanded">
-        <p>More ....</p>
-      </div> -->
     </div>
-
-    <!-- <button (click)="expanded = !expanded" class="text-darkgray dark:text-lightgray">
-      <span class="sr-only">More</span>
-      <fa-icon [icon]="faEllipsis"></fa-icon>
-    </button> -->
   </div>
 
   <hr class="border-lightgray dark:border-darkgray/60">
@@ -33,7 +24,7 @@
       <li class="mr-1">ID {{ link.id }}</li>
       <li class="mr-1">/</li>
       <li>
-        <a [href]="link.collection.link" [title]="'Read more in ' + link.collection.name" class="underline text-blue dark:text-link">
+        <a [href]="link.collection.link" target="_blank" [title]="'Read more in ' + link.collection.name" class="underline text-blue dark:text-link">
           {{ link.collection.name }}
         </a>
       </li>

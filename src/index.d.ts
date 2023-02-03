@@ -106,6 +106,7 @@ declare namespace Link {
     sourceDict?: string;
     targetDict?: string;
     similarity?: string;
+    conceptView?: boolean;
   }
 
   interface RawResult {

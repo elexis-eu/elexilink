@@ -88,6 +88,7 @@ export class FiltersComponent implements OnInit {
   toggleConceptView() {
     this.conceptView = !this.conceptView
     this.conceptViewToggled.emit(this.conceptView)
+    this.checkClearButton()
   }
 
   /**
@@ -100,6 +101,8 @@ export class FiltersComponent implements OnInit {
     } else if (this.hasSelectedItems(this.languages) || this.selectedLanguages.length > 0) {
       this.clearButtonEnabled = true
     } else if (this.hasSelectedItems(this.similarities) || this.selectedSimilarities.length > 0) {
+      this.clearButtonEnabled = true
+    } else if (this.conceptView) {
       this.clearButtonEnabled = true
     } else {
       this.clearButtonEnabled = false
@@ -126,6 +129,7 @@ export class FiltersComponent implements OnInit {
     this.languages = cloneDeep(this.languages.map(el => {el.selected = false; return el}))
     this.similarities = cloneDeep(this.similarities.map(el => {el.selected = false; return el}))
     this.clearButtonEnabled = false
+    this.conceptView = false;
 
     const config = {
       relativeTo: this.route,

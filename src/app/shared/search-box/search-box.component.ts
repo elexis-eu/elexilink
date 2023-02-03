@@ -44,7 +44,6 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
   constructor(
     private formBuilder: FormBuilder,
     public data: DataService,
-    private localStorage: LocalStorageService,
     private router: Router,
     private route: ActivatedRoute
   ) {}
@@ -100,18 +99,30 @@ export class SearchBoxComponent implements OnInit, AfterViewInit {
       this.form.value.sourceLanguage &&
       this.form.value.headword
     ) {
+      const wasHeadwordChanged = this.data.headword !== this.form.value.headword;
+      if (wasHeadwordChanged) {
+        this.data.headword = this.form.value.headword;
+        this.data.conceptView = false;
+        this.data.sourceDict = undefined;
+        this.data.targetDict = undefined;
+        this.data.targetLanguage = undefined;
+        this.data.similarity = undefined;
+      }
       let parameters = {} as Link.Parameters;
-      if (!!this.data.sourceDict) {
+      if (!!this.data.sourceDict && !wasHeadwordChanged) {
         parameters.sourceDict = this.data.sourceDict;
       }
-      if (!!this.data.targetLanguage) {
+      if (!!this.data.targetLanguage && !wasHeadwordChanged) {
         parameters.targetLanguage = this.data.targetLanguage;
       }
-      if (!!this.data.targetDict) {
+      if (!!this.data.targetDict && !wasHeadwordChanged) {
         parameters.targetDict = this.data.targetDict;
       }
-      if (!!this.data.similarity) {
+      if (!!this.data.similarity && !wasHeadwordChanged) {
         parameters.similarity = this.data.similarity;
+      }
+      if (!!this.data.conceptView && !wasHeadwordChanged) {
+        parameters.conceptView = this.data.conceptView;
       }
       const config = {
         queryParams: parameters,
